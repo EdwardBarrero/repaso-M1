@@ -12,7 +12,12 @@ const { Queue, Node, LinkedList, BinarySearchTree } = require("./DS.js");
 var countArray = function (array, total = 0) {
     // Tu código aca:
 
-
+    for (var i = 0; i < array.length; i++) {
+        if (Array.isArray(array[i])) { total = total + countArray(array[i]) }
+        else { total = total + array[i] }
+    }
+    console.log(total)
+    return total;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -21,26 +26,34 @@ var countArray = function (array, total = 0) {
 // cualquier tipo de dato, determinar la cantidad de propiedades de objetos en cualquier nivel, ya sea el inicial
 // u objetos anidados
 // Ejemplo:
-// var obj = {
-//   a: {
-//     a1: 10,
-//     a2: "Franco",
-//     a3: { f: "r", a: "n", c: { o: true } },
-//   },
-//   b: 2,
-//   c: [1, { a: 1 }, "Franco"],
-// };
-// var obj1 = {
-//     a: 1,
-//     b: 2,
-// };
+var obj = {
+    a: {
+        a1: 10,
+        a2: "Franco",
+        a3: { f: "r", a: "n", c: { o: true } },
+    },
+    b: 2,
+    c: [1, { a: 1 }, "Franco"],
+};
+var obj1 = {
+    a: 1,
+    b: 2,
+};
 // countProps(obj)--> Deberia devolver 10 ya que el objeto inicial tiene 3 propiedades, pero a su vez
 // dentro de a tenemos 3 propiedades mas, luego a3 tiene otras 3 y por ultimo c tiene una extra.
 // Propiedades: a, a1, a2, a3, f, a, c, o, b, c --> 10 en total
 
 var countProps = function (obj) {
     // Tu código aca:
-
+    var suma = 0;
+    for (prop in obj) {
+        if (typeof obj[prop] == "object" && !Array.isArray(obj[prop])) {
+            suma++;
+            suma += countProps(obj[prop])
+        }
+        else { suma++ }
+    }
+    return suma;
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -117,27 +130,37 @@ LinkedList.prototype.changeNotNumbers = function () {
 // Implementar la función mergeQueues que a partir de dos queues recibidas por parametro
 // debe devolver una nueva Queue que vaya mergeando los nodos de las anteriores.
 // Ejemplo:
-// - queueOne: [7,3,5]
-// - queueTwo: [2,4,6]
+var queueOne = [7, 3, 5]
+var queueTwo = [2, 4, 6]
 // mergeQueues(queueOne, queueTwo) --> [7,2,3,4,5,6]
 // IMPORTANTE: NO son arreglos sino que son Queues.
 
 var mergeQueues = function (queueOne, queueTwo) {
     // Tu código aca:
+    var q1Index = 0;
+    var q2Index = 0;
+    var merge = []
+    while (q1Index < Object.values(queueOne)[0].length && q2Index < Object.values(queueTwo)[0].length) {
+        merge.push(Object.values(queueOne)[0][q1Index]);
+        merge.push(Object.values(queueTwo)[0][q2Index]);
+        q1Index++;
+        q2Index++;
+    }
+    return merge.concat(Object.values(queueOne)[0].slice(q1Index)).concat(Object.values(queueTwo)[0].slice(q2Index));
 };
 
 
-// var queueOne = new Queue();
-// queueOne.enqueue(1);
-// queueOne.enqueue(3);
-// queueOne.enqueue(5);
-// queueOne.enqueue(7);
-// queueOne.enqueue(9);
-// var queueTwo = new Queue();
-// queueTwo.enqueue(2);
-// queueTwo.enqueue(4);
-// queueTwo.enqueue(6);
-// console.log("mergeQueues: ", mergeQueues(queueOne, queueTwo));
+var queueOne = new Queue();
+queueOne.enqueue(1);
+queueOne.enqueue(3);
+queueOne.enqueue(5);
+queueOne.enqueue(7);
+queueOne.enqueue(9);
+var queueTwo = new Queue();
+queueTwo.enqueue(2);
+queueTwo.enqueue(4);
+queueTwo.enqueue(6);
+console.log("mergeQueues: ", mergeQueues(queueOne, queueTwo));
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -152,13 +175,17 @@ var mergeQueues = function (queueOne, queueTwo) {
 
 var closureMult = function (multiplier) {
     // Tu código aca:
+    return function Multiplicar(num) {
+        var result = num * multiplier;
+        return result;
+    }
 };
 
-// var multByFour = closureMult(4);
-// console.log("multByFour: ", multByFour(2));
-// console.log("multByFour: ", multByFour(5));
-// var multBySix = closureMult(6);
-// console.log("multBySix: ", multBySix(4));
+var multByFour = closureMult(4);
+console.log("multByFour: ", multByFour(2));
+console.log("multByFour: ", multByFour(5));
+var multBySix = closureMult(6);
+console.log("multBySix: ", multBySix(4));
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -167,16 +194,21 @@ var closureMult = function (multiplier) {
 
 BinarySearchTree.prototype.sum = function () {
     // Tu código aca:
+    var suma = 0;
+    suma = suma + this.value
+    if (this.left) { suma += BinarySearchTree.sum(this.left) }
+    if (this.right) { suma += BinarySearchTree.sum(this.right) }
+    return suma;
 };
 
-// var bst = new BinarySearchTree(15);
-// bst.insert(10);
-// bst.insert(17);
-// bst.insert(5);
-// bst.insert(7);
-// bst.insert(3);
-// bst.insert(25);
-// console.log("sum: ", bst.sum());
+var bst = new BinarySearchTree(15);
+bst.insert(10);
+bst.insert(17);
+bst.insert(5);
+bst.insert(7);
+bst.insert(3);
+bst.insert(25);
+console.log("sum: ", bst.sum());
 
 // functionTwo()[(suma = 2)];
 // functionOne()[(suma = 9)];
@@ -194,52 +226,57 @@ BinarySearchTree.prototype.sum = function () {
 // resultado: [5,8,9,32,64] */
 BinarySearchTree.prototype.toArray = function () {
     // Tu código acá
+    var array = []
+    if (this.left) { array = array.concat(this.left.toArray()) };
+    array.push(this.value);
+    if (this.right) { array = array.concat(this.right.toArray()) };
+    return array;
 };
 
-// var bst = new BinarySearchTree(32);
-// bst.insert(8);
-// bst.insert(9);
-// bst.insert(5);
-// bst.insert(64);
-// console.log('toArray: ', bst.toArray())
+var bst = new BinarySearchTree(32);
+bst.insert(8);
+bst.insert(9);
+bst.insert(5);
+bst.insert(64);
+console.log('toArray: ', bst.toArray())
 // --------------------------------------------------------------------------------------------------------------------
 
 // Ordenar un array de objetos segun DNI de mayor a menor (descendente).
 // Ejemplo:
-// objetoPersonas = [
-//     {
-//         dni: 40607080,
-//         nombre: 'Carlitos',
-//         apellido: 'Fulano',
-//         edad: 22,
-//         email: 'carlosfulano123@gmail.com',
-//         username: 'xXElCrackXx',
-//     },
-//     {
-//         dni: 23242526,
-//         nombre: 'Maria',
-//         apellido: 'Gonzalez',
-//         edad: 48,
-//         email: 'mary.gon@hotmail.com',
-//         username: 'marymary321',
-//     },
-//     {
-//         dni: 90919293,
-//         nombre: 'Bartolomeo',
-//         apellido: 'Simpson',
-//         edad: 10,
-//         email: 'bartsimpson@gmail.com',
-//         username: 'elBarto',
-//     },
-//     {
-//         dni: 76757473,
-//         nombre: 'Doge',
-//         apellido: 'De Hoz',
-//         edad: 5,
-//         email: 'soyelperrofavorito@yahoo.com.ar',
-//         username: 'dogeOfficial',
-//     },
-// ];
+objetoPersonas = [
+    {
+        dni: 40607080,
+        nombre: 'Carlitos',
+        apellido: 'Fulano',
+        edad: 22,
+        email: 'carlosfulano123@gmail.com',
+        username: 'xXElCrackXx',
+    },
+    {
+        dni: 23242526,
+        nombre: 'Maria',
+        apellido: 'Gonzalez',
+        edad: 48,
+        email: 'mary.gon@hotmail.com',
+        username: 'marymary321',
+    },
+    {
+        dni: 90919293,
+        nombre: 'Bartolomeo',
+        apellido: 'Simpson',
+        edad: 10,
+        email: 'bartsimpson@gmail.com',
+        username: 'elBarto',
+    },
+    {
+        dni: 76757473,
+        nombre: 'Doge',
+        apellido: 'De Hoz',
+        edad: 5,
+        email: 'soyelperrofavorito@yahoo.com.ar',
+        username: 'dogeOfficial',
+    },
+];
 
 // Resultado: [
 //     {
@@ -276,7 +313,19 @@ BinarySearchTree.prototype.toArray = function () {
 //     },
 // ];
 
-function sortByDni(obj) { }
+function sortByDni(obj) {
+    if (obj.length <= 1) return obj;
+
+    var pivot = obj[0];
+    var minor = [];
+    var major = [];
+    for (var i = 1; i < obj.length; i++) {
+        if (pivot["dni"] < obj[i]["dni"]) { major.push(obj[i]) }
+        else { minor.push(obj[i]) }
+    }
+
+    return sortByDni(major).concat(pivot).concat(sortByDni(minor));
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -287,45 +336,59 @@ function sortByDni(obj) { }
 
 // El objeto de estudiantes es como el siguiente:
 
-// var estudiantes = {
-//     3320943: {
-//         nombre: 'Persona',
-// 		apellido: 'Apellido',
-// 		mail: 'mail@mail.com',
-// 		cursos: {
-// 			1: 'Cocina',
-// 			2: 'Mecánica'
-// 		}
-// 	},
-// 	90234: {
-// 		nombre: 'Persona',
-// 		apellido: 'Apellido',
-// 		mail: 'mail@mail.com',
-// 		cursos: {
-// 			2: 'Mecánica'
-// 		}
-// 	},
-// 	929340: {
-// 		nombre: 'Persona',
-// 		apellido: 'Apellido',
-// 		mail: 'mail@mail.com',
-// 		cursos: {
-// 			2: 'Mecánica'
-// 		}
-// 	},
-// 	123123: {
-// 		nombre: 'Persona',
-// 		apellido: 'Apellido',
-// 		mail: 'mail@mail.com',
-// 		cursos: {
-// 			1: 'Cocina',
-// 		}
-// 	}
-// }
-
-function recorrerAlumno(idCurso, objeto, cb) {
-    //Tu codigo aca:
+var estudiantes = {
+    3320943: {
+        nombre: 'Persona',
+        apellido: 'Apellido',
+        mail: 'mail@mail.com',
+        cursos: {
+            1: 'Cocina',
+            2: 'Mecánica'
+        }
+    },
+    90234: {
+        nombre: 'Persona',
+        apellido: 'Apellido',
+        mail: 'mail@mail.com',
+        cursos: {
+            2: 'Mecánica'
+        }
+    },
+    929340: {
+        nombre: 'Persona',
+        apellido: 'Apellido',
+        mail: 'mail@mail.com',
+        cursos: {
+            2: 'Mecánica'
+        }
+    },
+    123123: {
+        nombre: 'Persona',
+        apellido: 'Apellido',
+        mail: 'mail@mail.com',
+        cursos: {
+            1: 'Cocina',
+        }
+    }
 }
+
+function recorrerAlumno(idCurso, objeto) {
+    //Tu codigo aca:
+    var suma = 0;
+    //    if (idCurso == 1) { idCurso = "Cocina" }
+    //    else if (idCurso == 2) { idCurso = "Mecánica" }
+    for (prop in objeto) {
+        if (objeto.hasOwnProperty(idCurso)) {
+            suma++;
+            return suma;
+        }
+        if (typeof objeto[prop] == "object") {
+            suma += recorrerAlumno(idCurso, objeto[prop]);
+        }
+    }
+    return suma;
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -333,28 +396,71 @@ function recorrerAlumno(idCurso, objeto, cb) {
 // las cities que mas se repiten, en orden decreciente 
 // deberia devolver: 
 // [ 'nashville', 'madrid', 'barcelona', 'los angeles', 'london' ]
-// const citiesList = [
-//     "nashville",
-//     "nashville",
-//     "los angeles",
-//     "nashville",
-//     "memphis",
-//     "barcelona",
-//     "los angeles",
-//     "sevilla",
-//     "madrid",
-//     "canary islands",
-//     "barcelona",
-//     "madrid",
-//     "nashville",
-//     "barcelona",
-//     "london",
-//     "berlin",
-//     "madrid",
-//     "nashville",
-//     "london",
-//     "madrid",
-// ]
+const citiesList = [
+    "nashville",
+    "nashville",
+    "los angeles",
+    "nashville",
+    "memphis",
+    "barcelona",
+    "los angeles",
+    "sevilla",
+    "madrid",
+    "canary islands",
+    "barcelona",
+    "madrid",
+    "nashville",
+    "barcelona",
+    "london",
+    "berlin",
+    "madrid",
+    "nashville",
+    "london",
+    "madrid",
+]
 function orderCities(num) {
     //Tu codigo aca:
+    var arrayOrder = [];
+    var nuevaCity = new createCities(num[0]);
+    arrayOrder.push(nuevaCity);
+    for (var i = 1; i < num.length; i++) {
+        if (verificar(num[i], arrayOrder)) {
+            for (var j = 0; j < arrayOrder.length; j++) {
+                if (num[i] == arrayOrder[j]["city"]) { arrayOrder[j]["value"] = arrayOrder[j]["value"] + 1; }
+            }
+        }
+        else { var nuevaCity = new createCities(num[i]); arrayOrder.push(nuevaCity); }
+    }
+    arrayOrder = bubbleSort(arrayOrder);
+    for(var i = 0; i< arrayOrder.length; i++){
+        arrayOrder[i] = arrayOrder[i]["city"];
+    }
+    return arrayOrder;
+}
+
+function createCities(city) {
+    this.city = city;
+    this.value = 1;
+}
+
+function verificar(city, array) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i]["city"] == city) return true;
+        else return false;
+    }
+}
+
+function bubbleSort(array) {
+    for (var i = 0; i < array.length; i++) {
+        var k = 1;
+        array[k]["value"]
+        var temp = 0;
+        var j = 0;
+        while (j < array.length && k < array.length) {
+            if (array[k]["value"] > array[j]["value"]) { temp = array[j]; array[j] = array[k]; array[k] = temp; };
+            k++;
+            j++;
+        }
+        if (temp == 0) return array;
+    }
 }
